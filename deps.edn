@@ -1,0 +1,13 @@
+{:paths ["src"]
+ ;; kotoba-lang/json — Layer 1 (data) of the kotoba foundational stdlib.
+ ;; Pure-Clojure JSON encode/decode with no host dependency, so the same code
+ ;; runs on kotoba-WASM instead of punting JSON parsing to the host. Zero
+ ;; third-party runtime deps; .cljc.
+ ;; See ADR-kotoba-lang-foundational-stdlib.md.
+ :deps {}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {io.github.cognitect-labs/test-runner
+                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}}}
