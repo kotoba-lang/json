@@ -11,6 +11,17 @@
   (is (= "\"x\\r\\n\\ty\"" (json/json "x\r\n\ty")))
   (is (not (str/includes? (json/json "a\rb") "\r"))))
 
+(deftest control-characters-outside-the-seven-named-escapes-are-escaped
+  ;; RFC 8259 requires EVERY control character U+0000-U+001F to be escaped,
+  ;; not just \" \\ \b \f \n \r \t -- the fallback case used to pass the
+  ;; rest through raw, which real JSON parsers (python's json, jq) reject
+  ;; as an invalid unescaped control character.
+  (is (= "\"\\u0001\"" (json/json (str (char 1)))) "0x01, not one of the 7 named escapes")
+  (is (= "\"\\u001f\"" (json/json (str (char 0x1f)))) "0x1F, the last C0 control code")
+  (is (= (str (char 1) "hi" (char 0x1f))
+         (get (json/decode (json/encode {"x" (str (char 1) "hi" (char 0x1f))})) "x"))
+      "round-trips through encode+decode"))
+
 (deftest pretty-scalars-and-empties
   (is (= "{}" (json/json {})))
   (is (= "[]" (json/json [])))

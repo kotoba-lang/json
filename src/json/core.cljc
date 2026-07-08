@@ -3,6 +3,17 @@
   (:refer-clojure :exclude [read])
   (:require [clojure.string :as str]))
 
+(def ^:private hex-digits "0123456789abcdef")
+
+(defn- hex4
+  "4-digit hex for a JSON `\\uXXXX` escape (portable: bit ops + a lookup
+  table, no Long/Integer interop that would only work on :clj)."
+  [n]
+  (apply str (for [shift [12 8 4 0]] (nth hex-digits (bit-and (bit-shift-right n shift) 0xf)))))
+
+(defn- char-code [ch]
+  #?(:clj (int ch) :cljs (.charCodeAt ch 0)))
+
 (defn- esc [s]
   (apply str
          (map (fn [ch]
@@ -14,7 +25,14 @@
                   \newline "\\n"
                   \return "\\r"
                   \tab "\\t"
-                  (str ch)))
+                  ;; RFC 8259 §7: EVERY control character U+0000-U+001F must
+                  ;; be escaped, not just the 7 named above -- the fallback
+                  ;; case used to pass the rest through raw, producing a
+                  ;; JSON string literal with a literal control byte
+                  ;; embedded in it (invalid per both python's json and jq).
+                  (if (< (char-code ch) 0x20)
+                    (str "\\u" (hex4 (char-code ch)))
+                    (str ch))))
               (str s))))
 
 (defn- kstr [k] (if (keyword? k) (name k) (str k)))
