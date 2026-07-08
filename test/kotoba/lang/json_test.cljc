@@ -55,7 +55,7 @@
     (is (= d (json/decode (json/encode d))))))
 
 (deftest decode-errors
-  (is (thrown? clojure.lang.ExceptionInfo (json/decode "{")))
-  (is (thrown? clojure.lang.ExceptionInfo (json/decode "[1,2,")))
-  (is (thrown? clojure.lang.ExceptionInfo (json/decode "tru")))
-  (is (thrown? clojure.lang.ExceptionInfo (json/decode "1 2")))) ; trailing
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error) (json/decode "{")))
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error) (json/decode "[1,2,")))
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error) (json/decode "tru")))
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error) (json/decode "1 2")))) ; trailing
