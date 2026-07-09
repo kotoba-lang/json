@@ -131,6 +131,11 @@
                       (throw (ex-info "invalid JSON escape" {:pos i :escape e}))))
         :else (recur (inc i) (conj out ch))))))
 
+;; RFC 8259 §6 number grammar, exactly: optional '-', an integer part (0, or
+;; 1-9 followed by more digits -- no leading zeros), an optional '.' + digits
+;; fraction, an optional e/E [+-] digits exponent.
+(def ^:private number-re #"-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?")
+
 (defn- read-number [s i]
   (let [n (count s)
         end (loop [j i]
@@ -138,6 +143,19 @@
                 (recur (inc j))
                 j))
         token (subs s i end)]
+    ;; The scan above just grabs any run of digit/e/E/+/-/. chars -- it does
+    ;; NOT itself validate JSON number syntax, so a malformed token like
+    ;; "1.2.3" or "1e+5e3" reaches the host parser unchecked. JVM's
+    ;; Double/parseDouble and Long/parseLong both throw on those (fail
+    ;; closed) -- but JS's parseFloat/parseInt are lenient: they silently
+    ;; parse just the valid PREFIX and stop (parseFloat("1.2.3") => 1.2,
+    ;; parseInt("12--3", 10) => 12), never throwing -- so the exact same
+    ;; malformed JSON that correctly errors on :clj would silently decode
+    ;; to a truncated, wrong number on :cljs. Validated explicitly here,
+    ;; on BOTH platforms, so behavior doesn't depend on which host parser
+    ;; happens to be stricter.
+    (when-not (re-matches number-re token)
+      (throw (ex-info "invalid JSON number" {:pos i :token token})))
     [(if (re-find #"[.eE]" token)
        #?(:clj (Double/parseDouble token)
           :cljs (js/parseFloat token))
