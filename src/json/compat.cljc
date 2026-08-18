@@ -46,13 +46,38 @@
     (seq? x) (map keywordize x)
     :else x))
 
+(def parse-error-type
+  "The `:type` on every ex-info this namespace throws for malformed JSON.
+
+  Callers used to reach for cheshire's JVM class
+  (`com.fasterxml.jackson.core.JsonProcessingException`) to tell \"this body was
+  not JSON\" from any other failure. That name cannot cross to cljs and pins a
+  namespace to the JVM for the sake of one catch clause. `json.core/decode`
+  already throws ex-info, but with free-text messages and no stable key, so
+  there was nothing portable to dispatch on. This is that key.
+
+  Measured 2026-08-18 on json.core/decode: five malformed inputs produced four
+  DIFFERENT messages (\"invalid JSON token\", \"unterminated JSON string\",
+  \"invalid JSON value\", \"trailing JSON input\") with only `:pos` in common.
+  Matching on the message would be a new fragility, not a fix."
+  :json/parse-error)
+
 (defn parse-string
   "cheshire.core/parse-string. `nil` in, `nil` out. With a truthy second
-  argument, map keys become keywords."
+  argument, map keys become keywords.
+
+  Malformed input throws an ex-info carrying `:type :json/parse-error`, so a
+  caller can answer 400 rather than 500 without naming a JVM class. The original
+  reason and `:pos` are preserved under `:json/message` and `:pos`."
   ([s] (parse-string s false))
   ([s key-fn]
    (when (some? s)
-     (let [v (core/decode s)]
+     (let [v (try (core/decode s)
+                  (catch #?(:clj clojure.lang.ExceptionInfo :cljs :default) e
+                    (throw (ex-info "invalid JSON"
+                                    (assoc (or (ex-data e) {})
+                                           :type parse-error-type
+                                           :json/message (ex-message e))))))]
        (if key-fn (keywordize v) v)))))
 
 (defn generate-string

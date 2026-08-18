@@ -48,3 +48,18 @@
 (deftest round-trips-through-both-directions
   (let [v {:name "ok" :xs [1 2 3] :nested {:deep true}}]
     (is (= v (compat/parse-string (compat/generate-string v) true)))))
+
+(deftest malformed-input-carries-a-portable-type
+  (doseq [bad ["{" "{\"a\":}" "nope" "" "{\"a\":1}trailing"]]
+    (testing (pr-str bad)
+      (let [e (try (compat/parse-string bad) nil
+                   (catch #?(:clj clojure.lang.ExceptionInfo :cljs :default) e e))]
+        (is (some? e) "malformed input must throw")
+        (is (= :json/parse-error (:type (ex-data e))))
+        (is (string? (:json/message (ex-data e))) "the original reason is kept, not discarded")))))
+
+(deftest well-formed-input-does-not-throw
+  (is (= {"a" 1} (compat/parse-string "{\"a\":1}"))))
+
+(deftest parse-error-type-is-the-published-constant
+  (is (= compat/parse-error-type :json/parse-error)))
