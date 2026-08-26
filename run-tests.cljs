@@ -15,6 +15,7 @@
 (ns run-tests
   (:require [clojure.test :as t]
             [json.compat-test]
+            [json.escape-test]
             [json.lines-test]
             [kotoba.lang.json-test]
             ))
@@ -22,4 +23,4 @@
 (defmethod t/report [:cljs.test/default :end-run-tests] [m]
   (when-not (t/successful? m) (js/process.exit 1)))
 
-(t/run-tests 'json.compat-test 'json.lines-test 'kotoba.lang.json-test)
+(t/run-tests 'json.compat-test 'json.escape-test 'json.lines-test 'kotoba.lang.json-test)

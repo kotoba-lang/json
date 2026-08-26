@@ -90,12 +90,20 @@
   [x]
   (emit x 0 false))
 
-(defn- hex-val [ch]
-  (let [i (int ch)]
+(defn- hex-val
+  "One hex digit's value.
+
+  The bounds are numeric literals rather than `(int \\0)` and friends,
+  because that spelling was wrong on ClojureScript in a way that decoded
+  rather than threw: every `\\uXXXX` escape containing a-f or A-F silently
+  became a different character. `\\u65e5` decoded as U+6505 instead of
+  U+65E5 -- 攅 where 日 was written."
+  [ch]
+  (let [i (char-code ch)]
     (cond
-      (<= (int \0) i (int \9)) (- i (int \0))
-      (<= (int \a) i (int \f)) (+ 10 (- i (int \a)))
-      (<= (int \A) i (int \F)) (+ 10 (- i (int \A)))
+      (<= 48 i 57) (- i 48)                ; 0-9
+      (<= 97 i 102) (+ 10 (- i 97))        ; a-f
+      (<= 65 i 70) (+ 10 (- i 65))         ; A-F
       :else (throw (ex-info "invalid JSON unicode escape" {:char ch})))))
 
 (defn- codepoint [s i]
@@ -203,7 +211,10 @@
       (= ch \t) (if (starts? s i "true") [true (+ i 4)] (throw (ex-info "invalid JSON token" {:pos i})))
       (= ch \f) (if (starts? s i "false") [false (+ i 5)] (throw (ex-info "invalid JSON token" {:pos i})))
       (= ch \n) (if (starts? s i "null") [nil (+ i 4)] (throw (ex-info "invalid JSON token" {:pos i})))
-      (or (= ch \-) (and ch (<= (int \0) (int ch) (int \9)))) (read-number s i)
+      ;; Numeric literals for the same reason as `hex-val`: on ClojureScript
+      ;; `(int \\0)` is 0 but `(int \\a)` is ALSO 0, so the old bound admitted
+      ;; every letter into `read-number`.
+      (or (= ch \-) (and ch (<= 48 (char-code ch) 57))) (read-number s i)
       :else (throw (ex-info "invalid JSON value" {:pos i :char ch})))))
 
 (defn decode
