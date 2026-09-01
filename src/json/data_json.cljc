@@ -24,24 +24,47 @@
     (seq? x) (map #(transform-keys key-fn %) x)
     :else x))
 
+(defn- opts->map
+  "Accept either `clojure.data.json`'s trailing kwargs or a single options map.
+
+  `clojure.data.json/read-str` is `[string & options]`, so every call site this
+  namespace exists to leave untouched writes `(read-str s :key-fn keyword)` --
+  three arguments. The original signature here took an options MAP, so those
+  call sites threw `ArityException: Wrong number of args (3)`. A migration
+  surface that requires editing the call sites has no reason to exist, and the
+  docstrings promised a contract the code did not have.
+
+  The map form is kept because this namespace shipped with it and callers
+  wrote against it."
+  [opts]
+  (cond
+    (empty? opts) {}
+    (and (nil? (next opts)) (map? (first opts))) (first opts)
+    :else (apply hash-map opts)))
+
 (defn read-str
   "Parse JSON from a string. With `:key-fn`, map keys are transformed
-  recursively (same contract as clojure.data.json)."
-  ([s] (read-str s {}))
-  ([s {:keys [key-fn]}]
-   (let [v (core/decode s)]
-     (if key-fn (transform-keys key-fn v) v))))
+  recursively (same contract as clojure.data.json).
+
+  Takes trailing kwargs like `clojure.data.json`, or a single options map."
+  [s & opts]
+  (let [{:keys [key-fn]} (opts->map opts)
+        v (core/decode s)]
+    (if key-fn (transform-keys key-fn v) v)))
 
 (defn write-str
   "Serialize data to compact JSON. With `:key-fn`, map keys are transformed
-  before encoding (same contract as clojure.data.json)."
-  ([x] (write-str x {}))
-  ([x {:keys [key-fn]}]
-   (core/encode (if key-fn (transform-keys key-fn x) x))))
+  before encoding (same contract as clojure.data.json).
+
+  Takes trailing kwargs like `clojure.data.json`, or a single options map."
+  [x & opts]
+  (let [{:keys [key-fn]} (opts->map opts)]
+    (core/encode (if key-fn (transform-keys key-fn x) x))))
 
 (defn read
-  "Read JSON from a character stream. JVM only."
-  ([r] (read r {}))
-  ([r opts]
-   #?(:clj (read-str (slurp r) opts)
-      :cljs (throw (ex-info "json.data-json/read requires a JVM Reader" {})))))
+  "Read JSON from a character stream. JVM only.
+
+  Takes trailing kwargs like `clojure.data.json`, or a single options map."
+  [r & opts]
+  #?(:clj (apply read-str (slurp r) opts)
+     :cljs (throw (ex-info "json.data-json/read requires a JVM Reader" {}))))
