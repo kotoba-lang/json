@@ -1,7 +1,7 @@
 (ns json.core
   "Pure JSON encode/decode plus a pretty emitter used by kotoba DSLs."
   (:refer-clojure :exclude [read])
-  (:require [clojure.string :as str]))
+  (:require [kotoba.lang.text :as str]))
 
 (def ^:private hex-digits "0123456789abcdef")
 
