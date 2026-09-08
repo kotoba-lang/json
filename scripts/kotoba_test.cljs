@@ -23,7 +23,7 @@
             ["path" :as path]
             ["node:child_process" :as cp]
             [clojure.edn :as edn]
-            [clojure.string :as str]))
+            [kotoba.lang.text :as str]))
 
 (def expected-targets #{:jvm-kir :js :wasm})
 
