@@ -24,7 +24,7 @@
   number. `:on-error :skip` is available and has to be asked for, because a
   reader that drops what it cannot understand turns a corrupt file into a
   short one, and nothing downstream can tell a short answer from a small one."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [json.core :as json]))
 
 (defn split-records

@@ -10,7 +10,7 @@
   `json.core/encode` and `json.core/decode` directly."
   (:refer-clojure :exclude [read])
   (:require [json.core :as core]
-            #?(:clj [clojure.java.io :as io])))
+))
 
 (defn- transform-keys
   "Recursively apply `key-fn` to every map key."
