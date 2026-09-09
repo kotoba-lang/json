@@ -1,7 +1,13 @@
 (ns kotoba.json
-  "Compatibility shim for the kotoba DSL pretty JSON emitter."
-  (:require [json.core :as json]))
+  "Assembled from one repo per definition.
 
-(def json json/json)
-(def encode json/encode)
-(def decode json/decode)
+  This namespace holds no implementation. It re-exports the definitions
+  that each live in their own repo, so a call site can require one name
+  and a library can require only the definitions it actually uses."
+  (:require [kotoba.json.decode :as decode-ns]
+            [kotoba.json.encode :as encode-ns]
+            [kotoba.json.json :as json-ns]))
+
+(def decode "See kotoba.json.decode/decode." decode-ns/decode)
+(def encode "See kotoba.json.encode/encode." encode-ns/encode)
+(def json "See kotoba.json.json/json." json-ns/json)
