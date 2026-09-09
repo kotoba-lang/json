@@ -56,7 +56,25 @@
     (cond
       (nil? x)                      "null"
       (boolean? x)                  (str x)
-      (number? x)                   (if pretty? (str x) (numstr x))
+      ;; `numstr` in BOTH branches. It used to be `(if pretty? (str x) ...)`,
+      ;; which made the same value serialize two ways: `{"scale":32}` compact
+      ;; and `{"scale": 32.0}` pretty. Pretty and compact must differ in
+      ;; whitespace and in nothing else -- a caller that digests compact JSON
+      ;; and reads it back pretty was comparing two encodings of one value.
+      ;;
+      ;; `numstr` is the one that survives, not `str`, because writing a
+      ;; whole-valued float without its fraction is DELIBERATE and shared with
+      ;; the `:cljs` branch, where `Math.trunc` does the same: JavaScript has
+      ;; one number type, so `32.0` and `32` are the same value there and a
+      ;; host-dependent encoding would break every digest taken across the two.
+      ;;
+      ;; ⚠ THE CONSEQUENCE IS REAL AND IS NOT A BUG HERE: a Clojure Double does
+      ;; not survive a JSON round trip, because `32.0` is written `32` and read
+      ;; back a Long. JSON has one number type; a caller whose TYPES matter
+      ;; must carry them itself rather than ask this namespace to. Found
+      ;; 2026-09-09 by `torch`'s checkpoint suite, whose GradScaler came back
+      ;; with `:scale 32` where it saved `32.0`.
+      (number? x)                   (numstr x)
       (or (string? x) (keyword? x)) (str \" (esc (kstr x)) \")
       (map? x) (if (empty? x) "{}"
                  (let [entries (if pretty? x (sort-by (comp kstr key) x))]

@@ -1,6 +1,6 @@
 (ns json.core-test
   (:require [kotoba.lang.text :as str]
-            [clojure.test :refer [deftest is]]
+            [clojure.test :refer [deftest is testing]]
             [json.core :as json]
             [kotoba.json :as kotoba-json]
             [kotoba.lang.json :as lang-json]))
@@ -61,3 +61,38 @@
   (is (= (json/json {:a [1 :b]}) (kotoba-json/json {:a [1 :b]})))
   (is (= (json/encode {:b 2 :a 1}) (lang-json/encode {:b 2 :a 1})))
   (is (= {"a" 1} (lang-json/decode "{\"a\":1}"))))
+
+(deftest pretty-and-compact-differ-in-whitespace-and-nothing-else
+  ;; They did not. `emit` routed the pretty branch through `str` and the
+  ;; compact branch through `numstr`, so one Double serialized two ways:
+  ;;
+  ;;   (encode {:scale 32.0})  =>  {"scale":32}
+  ;;   (json   {:scale 32.0})  =>  {"scale": 32.0}
+  ;;
+  ;; Nothing in the suite compared the two, so it stayed green. Found
+  ;; 2026-09-09 from the other end: `torch`'s checkpoint suite failed because
+  ;; a GradScaler came back with `:scale 32` where it saved `32.0`.
+  (doseq [value [32.0 2.0 0.5 -0.0 1.0e10 (/ 1.0 3.0) 32 0 -7]]
+    (testing (pr-str value)
+      (let [compact (json/encode {:v value})
+            pretty (json/json {:v value})
+            strip (fn [s] (str/replace s #"\s" ""))]
+        (is (= (strip compact) (strip pretty))
+            (str "compact " compact " / pretty " pretty)))))
+  (testing "and the shared spelling is the one both HOSTS can write"
+    ;; `numstr`'s :cljs branch truncates a whole number too, because
+    ;; JavaScript has one number type. A host-dependent encoding would break
+    ;; every digest taken across the two.
+    (is (= "{\"v\":32}" (json/encode {:v 32.0})))
+    (is (= "{\"v\":0.5}" (json/encode {:v 0.5})))))
+
+(deftest a-whole-double-does-not-survive-a-round-trip-and-that-is-stated
+  ;; JSON has one number type. This is not a defect of this namespace -- it is
+  ;; what JSON is -- but it IS a fact a caller has to know, so it is pinned
+  ;; rather than left to be rediscovered. A caller whose TYPES matter must
+  ;; carry them itself.
+  (is (= 32 (get (json/decode (json/encode {:v 32.0})) "v")))
+  (is (= 0.5 (get (json/decode (json/encode {:v 0.5})) "v")))
+  (testing "the reader is not the lossy half -- it reads a written fraction"
+    (is (= 32.0 (get (json/decode "{\"v\":32.0}") "v")))
+    (is (double? (get (json/decode "{\"v\":32.0}") "v")))))
