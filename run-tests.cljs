@@ -16,6 +16,7 @@
   (:require [clojure.test :as t]
             [json.compat-test]
             [json.escape-test]
+            [json.jsonista-test]
             [json.lines-test]
             [kotoba.lang.json-test]
             ))
