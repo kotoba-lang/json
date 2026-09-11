@@ -80,10 +80,10 @@ amu compile "$PWD/kotoba/json_scalar.kotoba" --target js \
 
 ```sh
 clojure -M:test                      # the .cljc suite
-nbb scripts/kotoba_test.cljs         # the .kotoba suite, on :jvm-kir :js :wasm
+nbb scripts/kotoba_test.cljk         # the .kotoba suite, on :jvm-kir :js :wasm
 ```
 
-`scripts/kotoba_test.cljs` splices each batch in `test/kotoba/*.kotoba-part`
+`scripts/kotoba_test.cljk` splices each batch in `test/kotoba/*.kotoba-part`
 onto the library source and runs amu's official `amu test` harness, so every
 case runs on all three semantic targets. It needs `amu` on `PATH`, at
 `../amu/bin/amu` (the west layout), or at `$AMU`. It exits 2 — not 1 — when

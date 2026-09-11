@@ -80,7 +80,7 @@
 ;;
 ;; This file exports only `json-string-field`, so a host importing the
 ;; compiled artifact gets the operation and nothing else. The cases live in
-;; `test/kotoba/*.kotoba-part` and are run by `scripts/kotoba_test.cljs`,
+;; `test/kotoba/*.kotoba-part` and are run by `scripts/kotoba_test.cljk`,
 ;; which splices them onto this source and hands the result to `amu test`
 ;; (the official harness, which runs every case on `:jvm-kir`, `:js` AND
 ;; `:wasm`). They are split into batches for the fuel reason above: that
