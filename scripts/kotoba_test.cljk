@@ -27,7 +27,7 @@
 
 (def expected-targets #{:jvm-kir :js :wasm})
 
-;; Run from the repo root (that is where `nbb scripts/kotoba_test.cljs` is
+;; Run from the repo root (that is where `nbb scripts/kotoba_test.cljk` is
 ;; invoked from); `REPO` overrides. Not derived from argv: under nbb argv[1]
 ;; is the nbb binary, which silently resolved to /opt/homebrew.
 (def repo (path/resolve (or (.-REPO js/process.env) (.cwd js/process))))

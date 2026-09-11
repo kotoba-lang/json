@@ -2,7 +2,7 @@
   "String escapes, on BOTH runtimes.
 
   `json.core-test` is `.clj`, so the codec's own tests have only ever run
-  on the JVM -- and `run-tests.cljs` says so in its header. This namespace
+  on the JVM -- and `run-tests.cljk` says so in its header. This namespace
   is `.cljc` for exactly the reason that header gives: the bug it was
   written for was invisible to a JVM run, and a JVM run was all there was.
 

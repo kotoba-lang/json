@@ -15,7 +15,7 @@ kotoba-lang stdlib compatibility policy (kotoba-lang/kotoba-lang/docs/lang/stdli
   names in its header ("No structural JSON parsing *inside* the guest ...
   once `kotoba-lang/json` has a `.kotoba` port, use that"). It is one
   operation, not a port of `decode`. See ADR-2608292330.
-- `scripts/kotoba_test.cljs` — runs `test/kotoba/*.kotoba-part` through amu's
+- `scripts/kotoba_test.cljk` — runs `test/kotoba/*.kotoba-part` through amu's
   official `amu test` harness, so all 23 cases run on `:jvm-kir`, `:js` and
   `:wasm` (69 rows). Exits 2, not 1, when the suite could not be run.
 

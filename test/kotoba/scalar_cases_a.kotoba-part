@@ -1,5 +1,5 @@
 ;; Batch A -- structure. Spliced onto kotoba/json_scalar.kotoba by
-;; scripts/kotoba_test.cljs; not a standalone compilation unit.
+;; scripts/kotoba_test.cljk; not a standalone compilation unit.
 ;;
 ;; Batched because `amu test` runs every case in one file against a SINGLE
 ;; instance, and fuel is charged per function entry, so a whole suite shares

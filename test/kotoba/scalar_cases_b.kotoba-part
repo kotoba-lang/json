@@ -1,5 +1,5 @@
 ;; Batch B -- lexing: whitespace, escapes, UTF-8, and the refused escapes.
-;; Spliced onto kotoba/json_scalar.kotoba by scripts/kotoba_test.cljs; not a
+;; Spliced onto kotoba/json_scalar.kotoba by scripts/kotoba_test.cljk; not a
 ;; standalone compilation unit. See batch A's header for why these are split.
 
 (defn is-some? [got [:option :string] want :string] :bool
