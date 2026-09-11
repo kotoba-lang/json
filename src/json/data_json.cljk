@@ -8,6 +8,7 @@
 
   Migration surface, not the preferred API — new code should call
   `json.core/encode` and `json.core/decode` directly."
+  {:kotoba/export [read read-str write-str]}
   (:refer-clojure :exclude [read])
   (:require [json.core :as core]
 ))

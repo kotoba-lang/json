@@ -1,5 +1,6 @@
 (ns json.core
   "Pure JSON encode/decode plus a pretty emitter used by kotoba DSLs."
+  {:kotoba/export [decode encode json]}
   (:refer-clojure :exclude [read])
   (:require [kotoba.lang.text :as str]))
 
