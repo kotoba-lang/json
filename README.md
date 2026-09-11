@@ -79,8 +79,8 @@ amu compile "$PWD/kotoba/json_scalar.kotoba" --target js \
 ## Verify
 
 ```sh
-clojure -M:test                      # the .cljc suite
-nbb scripts/kotoba_test.cljk         # the .kotoba suite, on :jvm-kir :js :wasm
+kbb -M:test                      # the .cljc suite
+kbb --backend sci scripts/kotoba_test.cljk         # the .kotoba suite, on :jvm-kir :js :wasm
 ```
 
 `scripts/kotoba_test.cljk` splices each batch in `test/kotoba/*.kotoba-part`
