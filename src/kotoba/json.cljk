@@ -4,6 +4,7 @@
   This namespace holds no implementation. It re-exports the definitions
   that each live in their own repo, so a call site can require one name
   and a library can require only the definitions it actually uses."
+  {:kotoba/export [decode encode json]}
   (:require [kotoba.json.decode :as decode-ns]
             [kotoba.json.encode :as encode-ns]
             [kotoba.json.json :as json-ns]))

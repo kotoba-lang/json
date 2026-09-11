@@ -1,5 +1,6 @@
 (ns kotoba.lang.json
   "Compatibility namespace for the foundational JSON API."
+  {:kotoba/export [decode encode json]}
   (:require [json.core :as json]))
 
 (def encode json/encode)

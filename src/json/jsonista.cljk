@@ -44,6 +44,7 @@
   Luck is not a contract, and this surface has more room to be silently wrong --
   an option that is dropped here reshapes or renames keys and leaves the tests
   green. `object-mapper` therefore throws on anything it cannot honour."
+  {:kotoba/export [default-object-mapper keyword-keys-object-mapper object-mapper read-value write-value-as-string]}
   (:refer-clojure :exclude [read])
   (:require [json.core :as core]))
 

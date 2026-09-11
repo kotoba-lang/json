@@ -31,6 +31,7 @@
   `ex-info`. Two repos catch the Jackson type by name (kotoba-captcha,
   cloud-itonami) and must be edited by hand -- a shim cannot honestly
   reproduce a class it does not depend on."
+  {:kotoba/export [generate-string keywordize parse-error-type parse-string]}
   (:require [json.core :as core]))
 
 (defn keywordize
