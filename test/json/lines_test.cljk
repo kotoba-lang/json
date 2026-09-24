@@ -1,5 +1,5 @@
 (ns json.lines-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [json.lines :as ndjson]))
 
 (deftest one-value-per-line

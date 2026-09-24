@@ -17,7 +17,7 @@
   digits worked, hex letters became 0, and every escape still decoded to
   *some* character. `\\u65e5` came out as U+6505 -- 攅 where 日 was
   written."
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [json.core :as json]))
 
 (deftest unicode-escapes-with-hex-letters

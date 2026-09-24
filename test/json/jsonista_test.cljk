@@ -4,7 +4,7 @@
   declares it) and embedded verbatim -- a cross-library oracle, not a
   tautology. Where this namespace deliberately differs from jsonista, the test
   says so and pins BOTH values, so the difference cannot drift into a surprise."
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [json.jsonista :as j]))
 
 ;; ---------------------------------------------------------------- the difference
