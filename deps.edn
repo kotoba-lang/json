@@ -6,6 +6,10 @@
  ;; third-party runtime deps; .cljc.
  ;; See ADR-kotoba-lang-foundational-stdlib.md.
  :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
         io.github.kotoba-lang/json-decode
         {:git/url "https://github.com/kotoba-lang/json-decode.git"
          :git/sha "f7b03f38002e6d894800fa2d8f83003af55f1bbe"}

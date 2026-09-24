@@ -1,5 +1,5 @@
 (ns kotoba.lang.json-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [kotoba.lang.json :as json]))
 
 (deftest encode-scalars

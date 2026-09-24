@@ -2,7 +2,7 @@
   "kotoba.json re-exports clojure.data.json's read-str / write-str contract.
   Needs the definition repos (json-decode, ...) on the classpath, so it runs
   under `kbb -M:test`, not under run-tests.cljk's bare -cp."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [kotoba.json :as kj]
             [json.clojure-data-json :as j]))
 

@@ -1,5 +1,5 @@
 (ns json.data-json-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [json.core :as core]
             [json.data-json :as json]))
 

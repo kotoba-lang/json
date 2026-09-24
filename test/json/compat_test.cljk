@@ -7,7 +7,7 @@
     round-trips-through-both-directions (string keys where keywords expected)
   - make (parse-string nil) call core/decode -> nil-in-nil-out ERRORS (throws)
   - ignore :pretty -> pretty-opt-selects-the-two-space-form fails on newlines"
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [json.compat :as compat]
             [json.core :as core]))
 

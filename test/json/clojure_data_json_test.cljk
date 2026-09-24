@@ -3,7 +3,7 @@
   the JVM for the same input (measured 2026-09-24). The JVM side of this
   namespace was also compared against data.json directly: 415 inputs x
   options, 0 differences."
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [json.clojure-data-json :as j]))
 
 (defn- throws? [f] (try (f) false (catch #?(:clj Throwable :cljs :default) _ true)))

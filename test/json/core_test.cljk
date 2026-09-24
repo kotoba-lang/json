@@ -1,6 +1,6 @@
 (ns json.core-test
   (:require [kotoba.lang.text :as str]
-            [clojure.test :refer [deftest is testing]]
+            [kotoba.test :refer [deftest is testing]]
             [json.core :as json]
             [kotoba.json :as kotoba-json]
             [kotoba.lang.json :as lang-json]))
