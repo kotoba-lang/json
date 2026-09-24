@@ -161,7 +161,33 @@
 ;; RFC 8259 §6 number grammar, exactly: optional '-', an integer part (0, or
 ;; 1-9 followed by more digits -- no leading zeros), an optional '.' + digits
 ;; fraction, an optional e/E [+-] digits exponent.
-(def ^:private number-re #"-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?")
+;; Spelled as a scan over one-character substrings rather than a host regex
+;; literal (a `#"..."` is host data and is refused on the Kotoba project
+;; route); the accepted language is the regex it replaced,
+;; -?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?, matched against the whole
+;; token.
+(defn- char-at= [s i c]
+  (and (<= 0 i) (< i (count s)) (= c (subs s i (inc i)))))
+
+(defn- digit-at? [s i]
+  (and (<= 0 i) (< i (count s)) (str/includes? "0123456789" (subs s i (inc i)))))
+
+(defn- skip-digits [s i]
+  (loop [j i] (if (digit-at? s j) (recur (inc j)) j)))
+
+(defn- json-number? [s]
+  (let [i (if (char-at= s 0 "-") 1 0)
+        i (cond (char-at= s i "0") (inc i)
+                (digit-at? s i) (skip-digits s i)
+                :else -1)
+        i (if (char-at= s i ".")
+            (if (digit-at? s (inc i)) (skip-digits s (inc i)) -1)
+            i)
+        i (if (or (char-at= s i "e") (char-at= s i "E"))
+            (let [j (if (or (char-at= s (inc i) "+") (char-at= s (inc i) "-")) (+ i 2) (inc i))]
+              (if (digit-at? s j) (skip-digits s j) -1))
+            i)]
+    (= i (count s))))
 
 (defn- read-number [s i]
   (let [n (count s)
@@ -181,9 +207,9 @@
     ;; to a truncated, wrong number on :cljs. Validated explicitly here,
     ;; on BOTH platforms, so behavior doesn't depend on which host parser
     ;; happens to be stricter.
-    (when-not (re-matches number-re token)
+    (when-not (json-number? token)
       (throw (ex-info "invalid JSON number" {:pos i :token token})))
-    [(if (re-find #"[.eE]" token)
+    [(if (or (str/includes? token ".") (str/includes? token "e") (str/includes? token "E"))
        #?(:clj (Double/parseDouble token)
           :cljs (js/parseFloat token))
        #?(:clj (Long/parseLong token)
