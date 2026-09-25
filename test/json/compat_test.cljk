@@ -53,7 +53,7 @@
   (doseq [bad ["{" "{\"a\":}" "nope" "" "{\"a\":1}trailing"]]
     (testing (pr-str bad)
       (let [e (try (compat/parse-string bad) nil
-                   (catch #?(:clj clojure.lang.ExceptionInfo :cljs :default) e e))]
+                   (catch :default e e))]
         (is (some? e) "malformed input must throw")
         (is (= :json/parse-error (:type (ex-data e))))
         (is (string? (:json/message (ex-data e))) "the original reason is kept, not discarded")))))
