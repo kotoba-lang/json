@@ -74,7 +74,7 @@
   ([s key-fn]
    (when (some? s)
      (let [v (try (core/decode s)
-                  (catch #?(:clj clojure.lang.ExceptionInfo :cljs :default) e
+                  (catch :default e
                     (throw (ex-info "invalid JSON"
                                     (assoc (or (ex-data e) {})
                                            :type parse-error-type
