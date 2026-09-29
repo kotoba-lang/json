@@ -88,7 +88,9 @@
 
 #?(:kotoba
    (defn- elem-at [d :document i :i64] :document
-     (option-or (document-vector-at d i) (document-null))))
+     (if (= (document-kind d) :list)
+       (option-or (document-list-at d i) (document-null))
+       (option-or (document-vector-at d i) (document-null)))))
 
 #?(:kotoba
    (defn- entry-key [d :document i :i64] :document
