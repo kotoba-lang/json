@@ -9,12 +9,9 @@
 #?(:kotoba (defn encode [x :document] :string (json/encode x))
    :default (def encode json/encode))
 #?(:kotoba (defn decode [s :string] :document
-             ;; `json.core/decode` aborts, so its interface is a result here: unwrap
-             ;; it and abort again with the same error
-             (let [r (json/decode s)]
-               (if (result-ok?-of [:result :document :document] r)
-                 (result-value-of [:result :document :document] r (document-null))
-                 (throw (result-error-of [:result :document :document] r (document-null))))))
+             ;; `json.core/decode` aborts on malformed input (ADR 0363), so this
+             ;; forwards its document as is
+             (json/decode s))
    :default (def decode json/decode))
 #?(:kotoba (defn json [x :document] :string (json/json x))
    :default (def json json/json))
